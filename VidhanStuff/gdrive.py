@@ -1,33 +1,68 @@
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
+import os
 
-data_folder_id='1z4PjHNG4bxYG6NUb5tdZvqcTRx5WksAo'
-zip_folder_id='1kAdxN5oOv3jTYoSD6JN97sstCLJVU8w2'
+def authenticate():
+    gauth = GoogleAuth()
 
-def UploadToGdrive(gauth,filepath):
-    # Try to load saved client credentials
+    gauth.LoadClientConfigFile("client_secrets.json")
+
     gauth.LoadCredentialsFile("credentials.json")
     if gauth.credentials is None:
-        # Authenticate if they're not there
         gauth.LocalWebserverAuth()
     elif gauth.access_token_expired:
-        # Refresh them if expired
         gauth.Refresh()
     else:
-        # Initialize the saved creds
         gauth.Authorize()
 
-    # Save the current credentials to a file
     gauth.SaveCredentialsFile("credentials.json")
-    # Create a GoogleDrive instance with authenticated GoogleAuth instance
+    return gauth
+
+def upload(filepath):
+    gauth=authenticate()
+
     drive = GoogleDrive(gauth)
     
-
-    # Create a new file in Google Drive
-    upload_file = drive.CreateFile({'title': filepath})
-
-    # Set the content of the file from the local file
+    file_name = os.path.basename(filepath)
+    
+    upload_file = drive.CreateFile({
+        'title': file_name,
+        'parents': [{'id': '1z4PjHNG4bxYG6NUb5tdZvqcTRx5WksAo'}]
+    })
+    
     upload_file.SetContentFile(filepath)
-
-    # Upload the file
+    
     upload_file.Upload()
+    # CALL CHATGPT HERE
+
+def getFileList(drive, folder_id):
+    file_list = drive.ListFile({'q': f"'{folder_id}' in parents and trashed=false"}).GetList()
+    return file_list
+
+def downloadMostRecentFile(download_path):
+    gauth=authenticate()
+
+    drive = GoogleDrive(gauth)
+    
+    file_list = getFileList(drive, '1z4PjHNG4bxYG6NUb5tdZvqcTRx5WksAo')
+    
+    if not file_list:
+        print("No files found in the folder.")
+        return 0
+    
+    file_list.sort(key=lambda x: x['createdDate'], reverse=True)
+    
+    most_recent_file = file_list[0]
+    file_id = most_recent_file['id']
+    file_name = most_recent_file['title']
+    file_path = os.path.join(download_path, file_name)
+    
+    if os.path.exists(file_path):
+        print(f"File already exists: {file_path}")
+        return 0
+    
+    download_file = drive.CreateFile({'id': file_id})
+    
+    download_file.GetContentFile(file_path)
+    print(f"Downloaded file: {file_path}")
+    return 1
