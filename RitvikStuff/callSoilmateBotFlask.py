@@ -6,6 +6,49 @@ app = Flask(__name__)
 
 client = OpenAI()
 
+@app.route('/uploadFle', methods=['POST'])
+def upload_file():
+    data = request.json
+    print("hello")
+    fileName = data.get('fileName')
+    folderName = data.get('folderName')
+
+    if not fileName or not folderName:
+        return jsonify({"error": "File is required"}), 400
+    
+    try:
+        # Retrieve specific assistant
+        DownloadedfileName = "SMBP.pdf"
+        assistant = client.beta.assistants.retrieve("asst_MptmDGLUuHUQf9dEvfsFfWg3")
+
+        # Ready the files for upload to OpenAI
+        file_paths = ["./" + DownloadedfileName]
+        file_streams = [open(path, "rb") for path in file_paths]
+        print(file_streams)
+
+        # Use the upload and poll SDK helper to upload the files, add them to the vector store,
+        # and poll the status of the file batch for completion.
+        file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
+            vector_store_id='vs_2JCZBWOGWZXPiiyb3zHhYJwf', files=file_streams
+        )
+
+        # You can print the status and the file counts of the batch to see the result of this operation.
+        print(file_batch.status)
+        print(file_batch.file_counts)
+
+    
+        return jsonify({"response": "File uploaded successfully"}), 200
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+
+    
+
+
+    
+
 @app.route('/ask', methods=['POST'])
 def ask_question():
     data = request.json
