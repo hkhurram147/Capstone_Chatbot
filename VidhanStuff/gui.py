@@ -9,6 +9,7 @@ gauth = GoogleAuth()
 # Load client secrets
 gauth.LoadClientConfigFile("client_secrets.json")
 
+
 def enter_text():
     # Get text from entry widget and insert it into the text display widget
     input_text = entry.get()
