@@ -1,6 +1,7 @@
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 import os
+import requests
 
 def authenticate():
     gauth = GoogleAuth()
@@ -33,13 +34,20 @@ def upload(filepath):
     upload_file.SetContentFile(filepath)
     
     upload_file.Upload()
-    # CALL CHATGPT HERE
+    
+     # After uploading the file, call the /uploadFile endpoint
+    response = requests.post('http://localhost:5500/uploadFile', json={'filename': file_name})
+    
+    if response.status_code == 200:
+        print("File uploaded and /uploadFile endpoint called successfully.")
+    else:
+        print(f"Error calling /uploadFile endpoint: {response.content}")
 
 def getFileList(drive, folder_id):
     file_list = drive.ListFile({'q': f"'{folder_id}' in parents and trashed=false"}).GetList()
     return file_list
 
-def downloadMostRecentFile(download_path):
+def DownloadMostRecentFile(download_path):
     gauth=authenticate()
 
     drive = GoogleDrive(gauth)
