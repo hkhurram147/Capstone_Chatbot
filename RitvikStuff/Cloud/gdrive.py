@@ -6,17 +6,18 @@ import requests
 def authenticate():
     gauth = GoogleAuth()
 
-    gauth.LoadClientConfigFile("client_secrets.json")
-
-    gauth.LoadCredentialsFile("credentials.json")
+    gauth.LoadClientConfigFile("Cloud/client_secrets.json")
+    gauth.LoadCredentialsFile("Cloud/credentials.json")
     if gauth.credentials is None:
+        print("lmao")
         gauth.LocalWebserverAuth()
     elif gauth.access_token_expired:
+        print(gauth)
         gauth.Refresh()
     else:
         gauth.Authorize()
 
-    gauth.SaveCredentialsFile("credentials.json")
+    gauth.SaveCredentialsFile("Cloud/credentials.json")
     return gauth
 
 def upload(filepath):
@@ -37,11 +38,12 @@ def upload(filepath):
     
      # After uploading the file, call the /uploadFile endpoint
     response = requests.post('http://localhost:5500/uploadFile', json={'filename': file_name})
-    
     if response.status_code == 200:
         print("File uploaded and /uploadFile endpoint called successfully.")
     else:
         print(f"Error calling /uploadFile endpoint: {response.content}")
+    
+    return response
 
 def getFileList(drive, folder_id):
     file_list = drive.ListFile({'q': f"'{folder_id}' in parents and trashed=false"}).GetList()
@@ -56,7 +58,7 @@ def DownloadMostRecentFile(download_path):
     
     if not file_list:
         print("No files found in the folder.")
-        return 0
+        return ""
     
     file_list.sort(key=lambda x: x['createdDate'], reverse=True)
     
@@ -67,10 +69,10 @@ def DownloadMostRecentFile(download_path):
     
     if os.path.exists(file_path):
         print(f"File already exists: {file_path}")
-        return 0
+        return ""
     
     download_file = drive.CreateFile({'id': file_id})
     
     download_file.GetContentFile(file_path)
-    print(f"Downloaded file: {file_path}")
-    return 1
+
+    return file_path

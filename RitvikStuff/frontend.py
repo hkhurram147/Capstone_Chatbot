@@ -2,6 +2,17 @@ import streamlit as st
 import requests
 import json
 import base64
+from Cloud import gdrive
+import os
+import shutil
+
+def delete_folder(folder_path):
+    # Check if the folder exists
+    if os.path.exists(folder_path) and os.path.isdir(folder_path):
+        shutil.rmtree(folder_path)
+        return 1
+    else:
+        return 0
 
 # Flask server URL
 UPLOAD_URL = 'http://127.0.0.1:5500/uploadFile'
@@ -9,25 +20,13 @@ ASK_URL = 'http://127.0.0.1:5500/ask'
 
 def upload_file(file):
     if not file:
+        st.write(file)
         st.error("File is required")
         return
 
     try:
-        # Read the file content
-        file_content = file.getvalue()
-        file_extension = file.name.split('.')[-1]
-        
-        # Encode file content to base64
-        encoded_file_content = base64.b64encode(file_content).decode('utf-8')
-        
-        payload = {
-            "fileContent": encoded_file_content,
-            "fileExtension": file_extension
-        }
-
-        response = requests.post(UPLOAD_URL, json=payload)
+        response = gdrive.upload(file)
         response_data = response.json()
-
         if response.status_code == 200:
             st.success(response_data["response"])
         else:
@@ -57,9 +56,28 @@ st.title("File Upload and Question Interface")
 
 # File upload section
 st.header("Upload a File")
-uploaded_file = st.file_uploader("Choose a file", type=["pdf", "txt", "docx"])
-if st.button("Upload File"):
-    upload_file(uploaded_file)
+
+uploadbtn = st.button("Upload File")
+if "uploadbtn_state" not in st.session_state:
+    st.session_state.uploadbtn_state = False
+
+if uploadbtn or st.session_state.uploadbtn_state:
+    st.session_state.uploadbtn_state = True
+    uploaded_file = st.file_uploader("Choose a file", type=["pdf", "txt", "docx"])
+    if uploaded_file is not None:
+        # Save the uploaded file to a temporary location
+        temp_file_path = os.path.join("temp", uploaded_file.name)
+        
+        # Ensure the 'temp' directory exists
+        os.makedirs(os.path.dirname(temp_file_path), exist_ok=True)
+        
+        # Write the file to the specified path
+        with open(temp_file_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        
+        
+        # Upload the file to Google Drive
+        upload_file(temp_file_path)
 
 # Ask question section
 st.header("Ask a Question")

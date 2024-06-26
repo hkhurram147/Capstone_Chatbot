@@ -1,7 +1,32 @@
 from flask import Flask, request, jsonify
 from openai import OpenAI
+import shutil
+import glob
+from Cloud import gdrive
 import base64
 import os
+
+def move_file_to_folder(file_path, destination_folder):
+    # Check if the destination folder exists, if not, create it
+    if not os.path.exists(destination_folder):
+        os.makedirs(destination_folder)
+    
+    # Get the file name from the file path
+    file_name = os.path.basename(file_path)
+    
+    # Create the destination path
+    destination_path = os.path.join(destination_folder, file_name)
+    
+    # Move the file to the destination folder
+    shutil.move(file_path, destination_path)
+    print(f"Moved file: {file_path} to {destination_path}")
+def delete_folder(folder_path):
+    # Check if the folder exists
+    if os.path.exists(folder_path) and os.path.isdir(folder_path):
+        shutil.rmtree(folder_path)
+        return 1
+    else:
+        return 0
 
 # Initialize the Flask app
 app = Flask(__name__)
@@ -10,27 +35,36 @@ client = OpenAI()
 
 @app.route('/uploadFile', methods=['POST'])
 def upload_file():
+    data=request.json
+    filename=data.get('filename')
+    filepath=r'OpenAiKnowledgeBase'
+    downloadRes = gdrive.DownloadMostRecentFile(filepath)
+
+    if downloadRes == "":
+        return jsonify({"error": "File download error"}), 500
+
+    
     try:
-        data = request.json
-        file_content = base64.b64decode(data['fileContent'])
-        file_extension = data['fileExtension']
-        file_name = "uploaded_file." + file_extension  # You can customize this as needed
+        files=glob.glob(downloadRes)
+        if not files:
+            return jsonify({"error": "File is required"}), 400
         
-        # Save the file in the root folder
-        file_path = os.path.join(os.getcwd(), file_name)
-        with open(file_path, "wb") as f:
-            f.write(file_content)
+        most_recent_file = max(files, key=os.path.getmtime)
+        # Retrieve specific assistant
         
-        # Update the DownloadedfileName variable
-        DownloadedfileName = file_name
+        got_file_name = os.path.basename(most_recent_file)
+        print(got_file_name)
+
+        if got_file_name != filename:
+            return jsonify({"error": "Wrong File error"}), 500
         
-        print("File received and saved as:", DownloadedfileName)
+        if most_recent_file:
+            move_file_to_folder(most_recent_file, r'consumeFile')
         
-        # Retrieve specific assistant (assuming `client` is already initialized)
         assistant = client.beta.assistants.retrieve("asst_MptmDGLUuHUQf9dEvfsFfWg3")
 
         # Ready the files for upload to OpenAI
-        file_paths = [file_path]
+        file_paths = ['RitvikStuff/consumeFile']
         file_streams = [open(path, "rb") for path in file_paths]
         print(file_streams)
 
@@ -43,7 +77,11 @@ def upload_file():
         # You can print the status and the file counts of the batch to see the result of this operation.
         print(file_batch.status)
         print(file_batch.file_counts)
-    
+
+        res=delete_folder('RitvikStuff/consumeFile')
+        if res==0:
+            return jsonify({"error": "File Cleanup error"}), 500
+        
         return jsonify({"response": "File uploaded successfully"}), 200
     
     except Exception as e:
