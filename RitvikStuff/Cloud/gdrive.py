@@ -2,6 +2,14 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 import os
 import requests
+import shutil
+
+def delete_folder(folder_path):
+    if os.path.exists(folder_path) and os.path.isdir(folder_path):
+        shutil.rmtree(folder_path)
+        return 1
+    else:
+        return 0
 
 def authenticate():
     gauth = GoogleAuth()
@@ -40,6 +48,9 @@ def upload(filepath):
     response = requests.post('http://localhost:5500/uploadFile', json={'filename': file_name})
     if response.status_code == 200:
         print("File uploaded and /uploadFile endpoint called successfully.")
+        res= delete_folder('temp')
+        if res == 0:
+           print(f"File cleanup error")
     else:
         print(f"Error calling /uploadFile endpoint: {response.content}")
     

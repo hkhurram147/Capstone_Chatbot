@@ -5,6 +5,7 @@ import base64
 from Cloud import gdrive
 import os
 import shutil
+import time
 
 def delete_folder(folder_path):
     # Check if the folder exists
@@ -78,6 +79,7 @@ if uploadbtn or st.session_state.uploadbtn_state:
         
         # Upload the file to Google Drive
         upload_file(temp_file_path)
+   
 
 # Ask question section
 st.header("Ask a Question")
