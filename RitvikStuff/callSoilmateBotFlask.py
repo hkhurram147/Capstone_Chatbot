@@ -78,9 +78,6 @@ def upload_file():
         res = delete_folder('consumeFile')
         if res == 0:
             return jsonify({"error": "File Cleanup error"}), 500
-     #   res= delete_folder('temp')
-       # if res == 0:
-       #     return jsonify({"error": "File Cleanup error"}), 500
         
         return jsonify({"response": "File uploaded successfully"}), 200
     
