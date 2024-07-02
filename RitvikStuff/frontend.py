@@ -30,10 +30,13 @@ def upload_file(file):
         response_data = response.json()
         if response.status_code == 200:
             st.success(response_data["response"])
+            return 1
         else:
             st.error(response_data["error"])
+            return 0
     except Exception as e:
         st.error(str(e))
+        return 0
 
 def ask_question(question):
     if not question:
@@ -61,7 +64,7 @@ st.header("Upload a File")
 uploadbtn = st.button("Upload File")
 if "uploadbtn_state" not in st.session_state:
     st.session_state.uploadbtn_state = False
-
+upload_success=None
 if uploadbtn or st.session_state.uploadbtn_state:
     st.session_state.uploadbtn_state = True
     uploaded_file = st.file_uploader("Choose a file", type=["pdf", "txt", "docx"])
@@ -78,8 +81,13 @@ if uploadbtn or st.session_state.uploadbtn_state:
         
         
         # Upload the file to Google Drive
-        upload_file(temp_file_path)
-   
+        upload_success=upload_file(temp_file_path)
+
+if upload_success==1:
+    time.sleep(3)
+    res= delete_folder('temp')
+    if res == 0:
+        print(f"File cleanup error")
 
 # Ask question section
 st.header("Ask a Question")

@@ -48,9 +48,6 @@ def upload(filepath):
     response = requests.post('http://localhost:5500/uploadFile', json={'filename': file_name})
     if response.status_code == 200:
         print("File uploaded and /uploadFile endpoint called successfully.")
-        res= delete_folder('temp')
-        if res == 0:
-           print(f"File cleanup error")
     else:
         print(f"Error calling /uploadFile endpoint: {response.content}")
     
