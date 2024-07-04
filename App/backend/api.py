@@ -115,7 +115,7 @@ def ask_question():
         )
 
         messages = client.beta.threads.messages.list(thread_id=thread.id)
-        messages_str = str(messages)
+        messages_str = messages.data[0].content[0].text.value
         return jsonify({"response": messages_str}), 200
 
     except Exception as e:
