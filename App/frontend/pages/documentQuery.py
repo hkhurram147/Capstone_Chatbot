@@ -1,17 +1,17 @@
 import streamlit as st
 import requests
-import json
-import base64
 import sys
 import os
 # Add the parent directory to the system path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from modules.CloudUtils import gdrive
 
+st.markdown( "# Document Query")
+
+st.sidebar.markdown("## WELCOME TO DOCUMENT QUERY")
 
 import shutil
-import time
-
+docuQueryFolderID='1J19XU6RdlnVlCd-4y_R7YRN1Uw6JzDgl'
 def delete_folder(folder_path):
     # Check if the folder exists
     if os.path.exists(folder_path) and os.path.isdir(folder_path):
@@ -24,14 +24,14 @@ def delete_folder(folder_path):
 UPLOAD_URL = 'http://127.0.0.1:5500/uploadFile'
 ASK_URL = 'http://127.0.0.1:5500/ask'
 
-def upload_file(file):
+def upload_file(file,folderid):
     if not file:
         st.write(file)
         st.error("File is required")
         return
 
     try:
-        response = gdrive.upload(file)
+        response = gdrive.upload(file,folderid)
         response_data = response.json()
         if response.status_code == 200:
             st.success(response_data["response"])
@@ -86,7 +86,7 @@ if uploadbtn or st.session_state.uploadbtn_state:
         
         
         # Upload the file to Google Drive
-        upload_success=upload_file(temp_file_path)
+        upload_success=upload_file(temp_file_path,docuQueryFolderID)
 
 
 # Ask question section

@@ -35,7 +35,7 @@ def authenticate():
     gauth.SaveCredentialsFile(credentials_path)
     return gauth
 
-def upload(filepath):
+def upload(filepath,folderid):
     gauth=authenticate()
 
     drive = GoogleDrive(gauth)
@@ -44,7 +44,7 @@ def upload(filepath):
     
     upload_file = drive.CreateFile({
         'title': file_name,
-        'parents': [{'id': '1z4PjHNG4bxYG6NUb5tdZvqcTRx5WksAo'}]
+        'parents': [{'id': folderid}]
     })
     
     upload_file.SetContentFile(filepath)
@@ -52,7 +52,7 @@ def upload(filepath):
     upload_file.Upload()
     
      # After uploading the file, call the /uploadFile endpoint
-    response = requests.post('http://localhost:5500/uploadFile', json={'filename': file_name})
+    response = requests.post('http://localhost:5500/uploadFile', json={'filename': file_name, 'folder_id': folderid})
     if response.status_code == 200:
         print("File uploaded and /uploadFile endpoint called successfully.")
     else:
@@ -64,12 +64,12 @@ def getFileList(drive, folder_id):
     file_list = drive.ListFile({'q': f"'{folder_id}' in parents and trashed=false"}).GetList()
     return file_list
 
-def DownloadMostRecentFile(download_path):
+def DownloadMostRecentFile(download_path,folderid):
     gauth=authenticate()
 
     drive = GoogleDrive(gauth)
     
-    file_list = getFileList(drive, '1z4PjHNG4bxYG6NUb5tdZvqcTRx5WksAo')
+    file_list = getFileList(drive, folderid)
     
     if not file_list:
         print("No files found in the folder.")

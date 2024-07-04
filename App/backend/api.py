@@ -44,9 +44,10 @@ app = Flask(__name__)
 def upload_file():
     data = request.json
     filename = data.get('filename')
+    folder_id = data.get('folder_id')
     filepath = r'OpenAiKnowledgeBase'
     
-    downloadRes = gdrive.DownloadMostRecentFile(filepath)
+    downloadRes = gdrive.DownloadMostRecentFile(filepath, folder_id)
 
     if downloadRes == "":
         return jsonify({"error": "File download error"}), 500
@@ -115,7 +116,7 @@ def ask_question():
         )
 
         messages = client.beta.threads.messages.list(thread_id=thread.id)
-        messages_str = str(messages)
+        messages_str = messages.data[0].content[0].text.value
         return jsonify({"response": messages_str}), 200
 
     except Exception as e:
