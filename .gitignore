@@ -1,6 +1,7 @@
-RitvikStuff/Cloud/client_secrets.json
-RitvikStuff/Cloud/credentials.json
-RitvikStuff/credentials.json
-RitvikStuff/Cloud/settings.yml
-RitvikStuff/openai-key.yaml
+App/modules/CloudUtils/client_secrets.json
+App/modules/CloudUtils/credentials.json
+App/credentials.json
+App/modules/CloudUtils/settings.yml
+App/backend/openai-key.yaml
 .DS_Store
+temp

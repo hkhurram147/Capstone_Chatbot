@@ -2,8 +2,13 @@ import streamlit as st
 import requests
 import json
 import base64
-from Cloud import gdrive
+import sys
 import os
+# Add the parent directory to the system path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from modules.CloudUtils import gdrive
+
+
 import shutil
 import time
 
@@ -83,11 +88,6 @@ if uploadbtn or st.session_state.uploadbtn_state:
         # Upload the file to Google Drive
         upload_success=upload_file(temp_file_path)
 
-if upload_success==1:
-    time.sleep(3)
-    res= delete_folder('temp')
-    if res == 0:
-        print(f"File cleanup error")
 
 # Ask question section
 st.header("Ask a Question")
