@@ -1,9 +1,11 @@
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
-import os
 import requests
 import shutil
-
+import os
+import sys
+# Add the parent directory to the system path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 def delete_folder(folder_path):
     if os.path.exists(folder_path) and os.path.isdir(folder_path):
         shutil.rmtree(folder_path)
@@ -12,10 +14,15 @@ def delete_folder(folder_path):
         return 0
 
 def authenticate():
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    client_secrets_path = os.path.join(current_dir, 'client_secrets.json')
+    credentials_path = os.path.join(current_dir, 'credentials.json')
+
     gauth = GoogleAuth()
 
-    gauth.LoadClientConfigFile("Cloud/client_secrets.json")
-    gauth.LoadCredentialsFile("Cloud/credentials.json")
+    gauth.LoadClientConfigFile(client_secrets_path)
+    gauth.LoadCredentialsFile(credentials_path)
     if gauth.credentials is None:
         print("lmao")
         gauth.LocalWebserverAuth()
@@ -25,7 +32,7 @@ def authenticate():
     else:
         gauth.Authorize()
 
-    gauth.SaveCredentialsFile("Cloud/credentials.json")
+    gauth.SaveCredentialsFile(credentials_path)
     return gauth
 
 def upload(filepath):

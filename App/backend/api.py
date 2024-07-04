@@ -2,10 +2,16 @@ from flask import Flask, request, jsonify
 from openai import OpenAI
 import shutil
 import glob
-from Cloud import gdrive
+
 import os
 import yaml
 import argparse
+
+import sys
+
+# Add the parent directory to the system path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from modules.CloudUtils import gdrive
 
 def read_yaml(file_path):
     if not os.path.exists(file_path):
@@ -39,6 +45,7 @@ def upload_file():
     data = request.json
     filename = data.get('filename')
     filepath = r'OpenAiKnowledgeBase'
+    
     downloadRes = gdrive.DownloadMostRecentFile(filepath)
 
     if downloadRes == "":
