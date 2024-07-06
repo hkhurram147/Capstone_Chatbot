@@ -1,16 +1,17 @@
 import streamlit as st
 import requests
-import json
-import base64
 import sys
 import os
 # Add the parent directory to the system path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from modules.CloudUtils import gdrive
 
+st.markdown( "# Document Query")
+
+st.sidebar.markdown("## WELCOME TO DOCUMENT QUERY")
+
 
 import shutil
-import time
 
 def delete_folder(folder_path):
     # Check if the folder exists

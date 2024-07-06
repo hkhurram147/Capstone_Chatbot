@@ -1,30 +1,30 @@
 import streamlit as st
-from pages import dataIngestion,documentGenerator,documentQuery,pptMaker
-import sys
-import os
-# Add the parent directory to the system path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import modules.CloudUtils
+
+st.set_page_config(
+    page_title="Welcome to PhoenixAI!",
+    page_icon="👋",
+)
+
+st.write("# Welcome to PhoenixAI 👋")
+
+st.sidebar.success("Select a demo above.")
+
+st.markdown(
+    """
+    Phoenix AI is a platform to make your office work easier, by automating the repetitive tasks.
+    //data analysis, document generation, ppt generation, form filler etc.
+
+    1. **📊 Data Analysis:** Analyze your data with ease.
+
+    2. **📈 Data Visualization:** Visualize your data with interactive charts.
+
+    3. **📑 PPT Maker:** Create a PowerPoint presentation with your data.
+
+    4. **📝 Form Filler:** Fill out forms with your data. 
+
+"""
+)
+
+st.write("## Select a demo from the sidebar to get started.")
 
 
-# Function to navigate to a different page
-def navigate_to(page):
-    st.session_state.page = page
-# Initialize session state for page navigation
-if 'page' not in st.session_state:
-    st.session_state.page = 'page'
-    st.header("Welcome To Pheonix")
-    st.write("Please select a tool on the left sidebar")
-elif 'page' in st.session_state:
-    st.session_state.page = 'page'
-    st.header("Welcome To Pheonix")
-    st.write("Please select a tool on the left sidebar")
-# Render the appropriate page based on the session state
-if st.session_state.page == 'documentQuery':
-    documentQuery.show(navigate_to)
-elif st.session_state.page == 'dataIngestion':
-    dataIngestion.show(navigate_to)
-elif st.session_state.page == 'documentGenerator':
-    documentGenerator.show(navigate_to)
-elif st.session_state.page == 'pptMaker':
-    pptMaker.show(navigate_to)
