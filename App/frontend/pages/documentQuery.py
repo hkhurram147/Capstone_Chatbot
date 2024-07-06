@@ -10,6 +10,7 @@ st.markdown( "# Document Query")
 
 st.sidebar.markdown("## WELCOME TO DOCUMENT QUERY")
 
+
 import shutil
 docuQueryFolderID='1J19XU6RdlnVlCd-4y_R7YRN1Uw6JzDgl'
 def delete_folder(folder_path):
