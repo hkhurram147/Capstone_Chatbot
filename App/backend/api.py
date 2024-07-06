@@ -44,9 +44,10 @@ app = Flask(__name__)
 def upload_file():
     data = request.json
     filename = data.get('filename')
+    folder_id = data.get('folder_id')
     filepath = r'OpenAiKnowledgeBase'
     
-    downloadRes = gdrive.DownloadMostRecentFile(filepath)
+    downloadRes = gdrive.DownloadMostRecentFile(filepath, folder_id)
 
     if downloadRes == "":
         return jsonify({"error": "File download error"}), 500
