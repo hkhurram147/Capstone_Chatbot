@@ -1,12 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file, after_this_request
 from openai import OpenAI
 import shutil
 import glob
-
+import time
 import os
 import yaml
 import argparse
-
 import sys
 
 # Add the parent directory to the system path
@@ -37,8 +36,6 @@ def delete_folder(folder_path):
         return 0
 
 app = Flask(__name__)
-
-
 
 @app.route('/uploadFile', methods=['POST'])
 def upload_file():
@@ -122,17 +119,77 @@ def ask_question():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/make-ppt', methods=['POST'])
+def make_ppt():
+    data = request.json
+    topic = data.get('topic')
+
+    if not topic:
+        return jsonify({"error": "Presentation topic is required"}), 400
+
+    try:
+        time.sleep(20)
+        print("Getting assistant")
+        assistant = client.beta.assistants.retrieve("asst_MptmDGLUuHUQf9dEvfsFfWg3")
+
+        thread = client.beta.threads.create()
+        message = client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content=f"Make a ppt on the following topic: {topic}"
+        )
+
+        run = client.beta.threads.runs.create_and_poll(
+            thread_id=thread.id,
+            assistant_id=assistant.id,
+        )
+
+        while run.status != "completed":
+            if run.status == "failed":
+                print("Run failed: " + run.status + '\n')
+                time.sleep(40)
+                assistant = client.beta.assistants.retrieve("asst_MptmDGLUuHUQf9dEvfsFfWg3")
+                thread = client.beta.threads.create()
+                message = client.beta.threads.messages.create(
+                    thread_id=thread.id,
+                    role="user",
+                    content=f"Make a ppt on the following topic: {topic}"
+                )
+                run = client.beta.threads.runs.create_and_poll(
+                    thread_id=thread.id,
+                    assistant_id=assistant.id,
+                )
+        
+        messages = client.beta.threads.messages.list(thread_id=thread.id)
+        ppt_link = messages.data[0].content[0].text.annotations[0].file_path.file_id
+
+        file_name = client.files.content(ppt_link)
+        file_bytes = file_name.read()
+        print("File bytes received")
+
+        ppt_file_path = os.path.join(os.getcwd(), f"{topic}.pptx")
+        with open(ppt_file_path, "wb") as f:
+            f.write(file_bytes)
+
+        if not os.path.exists(ppt_file_path):
+            return jsonify({"error": "Failed to create presentation file"}), 500
+
+
+        return send_file(ppt_file_path, as_attachment=True)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='insert openai-key.')
-    parser.add_argument('--get-key', action='store_true', help='get openai API key from config')
+    parser = argparse.ArgumentParser(description='Insert OpenAI key.')
+    parser.add_argument('--get-key', action='store_true', help='Get OpenAI API key from config')
 
     args = parser.parse_args()
 
     yaml_file_path = 'openai-key.yaml'
     config = read_yaml(yaml_file_path)
-    
 
-    if config!=0:
+    if config != 0:
         key = None
         if args.get_key:
             key = config.get('API-key')
@@ -141,6 +198,6 @@ if __name__ == '__main__':
             print("API-key not set")
         client = OpenAI(api_key=key)
     else:
-        client=OpenAI()
+        client = OpenAI()
 
     app.run(host='0.0.0.0', port=5500)
