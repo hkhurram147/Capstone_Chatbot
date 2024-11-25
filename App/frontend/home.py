@@ -1,30 +1,34 @@
 import streamlit as st
+import os
 
+# Get the directory containing the current script
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Set page configuration
 st.set_page_config(
-    page_title="Welcome to PhoenixAI!",
+    page_title="Welcome to GEI Bot!",
     page_icon="👋",
+    layout="wide"
 )
 
-st.write("# Welcome to PhoenixAI 👋")
+# Create two columns: left for title, right for logo
+col1, col2 = st.columns([3, 1])
 
+with col1:
+    st.write("# Welcome to GEI Bot 👋")
+
+with col2:
+    # Construct absolute path to image
+    image_path = os.path.join(current_dir, "logo.png")
+    
+    # Add debug print to verify path
+    print(f"Looking for image at: {image_path}")
+    
+    # Check if file exists before trying to display
+    if os.path.exists(image_path):
+        st.image(image_path, width=100, use_container_width=False)
+    else:
+        st.error(f"Logo file not found at {image_path}")
+
+# Sidebar content
 st.sidebar.success("Select a demo above.")
-
-st.markdown(
-    """
-    Phoenix AI is a platform to make your office work easier, by automating the repetitive tasks.
-    //data analysis, document generation, ppt generation, form filler etc.
-
-    1. **📊 Data Analysis:** Analyze your data with ease.
-
-    2. **📈 Data Visualization:** Visualize your data with interactive charts.
-
-    3. **📑 PPT Maker:** Create a PowerPoint presentation with your data.
-
-    4. **📝 Form Filler:** Fill out forms with your data. 
-
-"""
-)
-
-st.write("## Select a demo from the sidebar to get started.")
-
-
