@@ -43,3 +43,23 @@ if uploaded_file:
         os.remove(temp_file_path)
     else:
         st.error("Only PDF files are allowed. Please upload a valid PDF.")
+
+
+
+# Sidebar logo placement
+
+with st.sidebar:
+    # Container for logo with custom CSS class
+    st.markdown('<div class="sidebar-logo">', unsafe_allow_html=True)
+    
+    # Construct absolute path to image
+    image_path = "logo.png"
+    
+    # Check if file exists before trying to display
+    if os.path.exists(image_path):
+        st.image(image_path, width=100, use_container_width=True)  # Updated parameter
+    else:
+        st.error("Logo not found")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    

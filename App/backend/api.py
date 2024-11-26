@@ -48,7 +48,6 @@ threads = {}  # Dictionary to store thread instances with their names
 
 # Initialize OpenAI client at the global scope
 client = OpenAI()
-
 @app.route('/uploadFile', methods=['POST'])
 def upload_file():
     # Check if the file is in the request
@@ -77,6 +76,26 @@ def upload_file():
     logging.debug(f"File saved temporarily at {temp_path}")
 
     try:
+        # Initialize the OpenAI client (ensure correct initialization based on your SDK)
+        client = OpenAI()  # Make sure this is the correct way to initialize
+
+        # Upload the file to the assistant’s vector store
+        assistant = client.beta.assistants.retrieve("asst_Wk1Ue0iDYkhbdiXXDPPJsvAV")
+
+        with open(temp_path, "rb") as f:
+            file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
+                vector_store_id='vs_qUspcB7VllWXM4z7aAEdIK9L', files=[f]
+            )
+
+        # Check upload status
+        if file_batch.status != "completed":
+            logging.error("File upload to vector store failed")
+            return jsonify({"error": "File upload to vector store failed"}), 500
+
+        logging.debug("File successfully uploaded to vector store")
+
+        # **Proceed with embedding extraction and storage**
+
         # Extract text from PDF using pdfplumber
         with pdfplumber.open(temp_path) as pdf:
             pages = pdf.pages
@@ -88,19 +107,25 @@ def upload_file():
 
         model = SentenceTransformer('all-MiniLM-L6-v2')  # Choose an appropriate model
 
-
         # Generate embedding for the extracted text
         embedding = model.encode(text).tolist()  # Convert numpy array to list for JSON serialization
+
+        # **Handle the 'category' field**
+        # Example: Extract category from filename assuming format "Category_DocumentName.pdf"
+        # Adjust the logic based on your actual filename structure or data source
+        try:
+            category = sanitized_filename.split('_')[0]  # Example extraction
+        except IndexError:
+            category = "Uncategorized"
 
         # Prepare metadata
         doc_id = sanitized_filename
         metadata = {
-            ####### how to add the document class too?
-            "category": "",
+            "category": category,
             "doc_id": doc_id,
             "file_path": os.path.abspath(temp_path),
             "title": os.path.splitext(sanitized_filename)[0],
-            ##"upload_time": datetime.utcnow().isoformat()
+            "upload_time": datetime.utcnow().isoformat()
             # Add more metadata fields as needed
         }
 
@@ -127,12 +152,15 @@ def upload_file():
         os.remove(temp_path)
         logging.debug(f"Temporary file {temp_path} removed after processing.")
 
+        # **Final Response after all processing is done**
         return jsonify({"response": "File uploaded and embeddings stored successfully."}), 200
 
+    except OpenAIError as e:
+        logging.exception("An OpenAI error occurred during file upload and processing.")
+        return jsonify({"error": f"OpenAI Error: {str(e)}"}), 500
     except Exception as e:
-        logging.exception("An error occurred during file upload and processing.")
+        logging.exception("An unexpected error occurred during file upload and processing.")
         return jsonify({"error": str(e)}), 500
-
 
 
 def ir_stuff(filename, K):

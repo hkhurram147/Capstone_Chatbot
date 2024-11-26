@@ -113,3 +113,22 @@ if st.session_state.selected_thread:
         ask_question(question, st.session_state.selected_thread)
 else:
     st.write("Please select or create a thread to continue.")
+
+
+# Sidebar logo placement
+
+with st.sidebar:
+    # Container for logo with custom CSS class
+    st.markdown('<div class="sidebar-logo">', unsafe_allow_html=True)
+    
+    # Construct absolute path to image
+    image_path = "logo.png"
+    
+    # Check if file exists before trying to display
+    if os.path.exists(image_path):
+        st.image(image_path, width=100, use_container_width=True)  # Updated parameter
+    else:
+        st.error("Logo not found")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
