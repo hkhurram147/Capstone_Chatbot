@@ -1,7 +1,7 @@
 # GEI Chat Bot Documentation
 
 ## Overview
-GEI Chat Bot is an AI-powered document management system that enables users to upload PDFs, query documents, and interact with content through a conversational interface. Leveraging OpenAI's capabilities, the system provides seamless integration between document storage, embedding generation, and conversational querying, enhancing productivity and information retrieval.
+This chatbot application for our Engineering Science Capstone Project is an AI-powered document management system that enables users to upload PDFs, query documents, and interact with content through a conversational interface. Leveraging OpenAI's capabilities, the system provides seamless integration between document storage, embedding generation, and conversational querying, enhancing productivity and information retrieval.
 
 ## Project Structure
 
