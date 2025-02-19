@@ -78,6 +78,8 @@ Before setting up the Chatbot, ensure you have the following installed on your W
 ### Configuration
 
 #### 1. Set Up the OpenAI API Key
+**Note:** You must obtain access on your ChatGPT API account before being able to use your API Key and access the chatbot. Please contact hkhurram122@gmail.com for access information.
+
 1. Navigate to [OpenAI API Keys](https://platform.openai.com/account/api-keys).
 2. Click on **"Create new secret key"** and copy the generated API key.
 3. In the Git Bash terminal within VSCode, set the environment variable:
