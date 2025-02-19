@@ -1,13 +1,12 @@
-# GEI Chat Bot Documentation
+# Capstone Project: Chatbot Documentation
 
 ## Overview
 This chatbot application for our Engineering Science Capstone Project is an AI-powered document management system that enables users to upload PDFs, query documents, and interact with content through a conversational interface. Leveraging OpenAI's capabilities, the system provides seamless integration between document storage, embedding generation, and conversational querying, enhancing productivity and information retrieval.
 
 ## Project Structure
 
-In the app folder, you will find the following folder structure:
 ```
-GEI_Chatbot/
+App/
 ├── backend/
 │   ├── api.py          # Flask server
 │   ├── temp/           # Temporary PDF storage
@@ -24,7 +23,7 @@ GEI_Chatbot/
 ## Setup Instructions
 
 ### Prerequisites
-Before setting up the GEI Chat Bot, ensure you have the following installed on your Windows machine:
+Before setting up the Chatbot, ensure you have the following installed on your Windows machine:
 
 - **Python 3.8+**: [Download Python](https://www.python.org/downloads/)
 - **Git**: [Download Git](https://git-scm.com/downloads)
@@ -36,11 +35,11 @@ Before setting up the GEI Chat Bot, ensure you have the following installed on y
 #### 1. Clone the Repository
 1. Open **Visual Studio Code (VSCode)**.
 2. Open the terminal in VSCode by navigating to **View > Terminal** or pressing ``Ctrl + ` ``.
-3. Clone the GEI Chat Bot repository. Replace `[repository-url]` with the actual URL of your repository.
+3. Clone the Chatbot repository. Replace `[repository-url]` with the actual URL of your repository.
 
     ```bash
     git clone [repository-url]
-    cd GEI_Chatbot/App
+    cd Capstone_Chatbot/App
     ```
 
     **Note:** Ensure you have access to the GitHub repository. If the repository is private, request access from the repository owner.
@@ -50,7 +49,7 @@ Before setting up the GEI Chat Bot, ensure you have the following installed on y
 2. Navigate to the project directory if not already there.
 
     ```bash
-    cd GEI_Chatbot/App
+    cd Capstone_Chatbot/App
     ```
 
 3. Create a virtual environment named `openai-env`:
@@ -162,7 +161,7 @@ Before setting up the GEI Chat Bot, ensure you have the following installed on y
 
 5. **Expected Behavior:**
     - Streamlit will launch the frontend application.
-    - A new browser window or tab should automatically open, displaying the home page of the GEI Chat Bot website.
+    - A new browser window or tab should automatically open, displaying the home page of the Chatbot website.
     - If it doesn't open automatically, navigate to the URL provided in the terminal (usually `http://localhost:8501`).
 
 ### Using the Application
